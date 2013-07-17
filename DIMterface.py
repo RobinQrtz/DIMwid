@@ -46,7 +46,7 @@ class MainWindow(QtGui.QWidget):
 
         self.format_syntax = QtGui.QPushButton("Syntax")
         self.format_phrase = QtGui.QPushButton("Phrase")
-        self.format_hieroCube = QtGui.QPushButton("Hiero Cube")
+        self.format_syntaxCube = QtGui.QPushButton("Syntax Cube")
         self.format_phraseStackFlag = QtGui.QPushButton("Phrase Stack (flag)")
         self.format_phraseStackVerbose = QtGui.QPushButton("Phrase Stack (verbose)")
         
@@ -57,8 +57,8 @@ class MainWindow(QtGui.QWidget):
         format_action_phrase = QtGui.QWidgetAction(self.format_drop)
         format_action_phrase.setDefaultWidget(self.format_phrase)
         
-        format_action_hieroCube = QtGui.QWidgetAction(self.format_drop)
-        format_action_hieroCube.setDefaultWidget(self.format_hieroCube)
+        format_action_syntaxCube = QtGui.QWidgetAction(self.format_drop)
+        format_action_syntaxCube.setDefaultWidget(self.format_syntaxCube)
         
         format_action_phraseStackFlag = QtGui.QWidgetAction(self.format_drop)
         format_action_phraseStackFlag.setDefaultWidget(self.format_phraseStackFlag)
@@ -69,14 +69,14 @@ class MainWindow(QtGui.QWidget):
 
         self.format_drop.menu().addAction(format_action_syntax)
         self.format_drop.menu().addAction(format_action_phrase)
-        self.format_drop.menu().addAction(format_action_hieroCube)
+        self.format_drop.menu().addAction(format_action_syntaxCube)
         self.format_drop.menu().addAction(format_action_phraseStackFlag)
         self.format_drop.menu().addAction(format_action_phraseStackVerbose)
 
         
         self.format_syntax.clicked.connect(self.set_format_syntax)
         self.format_phrase.clicked.connect(self.set_format_phrase)
-        self.format_hieroCube.clicked.connect(self.set_format_hieroCube)
+        self.format_syntaxCube.clicked.connect(self.set_format_syntaxCube)
         self.format_phraseStackFlag.clicked.connect(self.set_format_phraseStackFlag)
         self.format_phraseStackVerbose.clicked.connect(self.set_format_phraseStackVerbose)
 
@@ -166,8 +166,8 @@ class MainWindow(QtGui.QWidget):
                 self.data.read_syntax()
             elif self.format == "phrase":
                 self.data.read_phrase()
-            elif self.format == "hieroCube":
-                self.data.read_hiero_cubes(self.cell_limit)
+            elif self.format == "syntaxCube":
+                self.data.read_syntax_cubes(self.cell_limit)
             elif self.format == "phraseStackFlag":
                 self.data.read_phrase_stack_flag(self.cell_limit)
             elif self.format == "phraseStackVerbose":
@@ -257,9 +257,9 @@ class MainWindow(QtGui.QWidget):
         self.format = "phrase"
         self.format_drop.setText("Phrase")
         
-    def set_format_hieroCube(self):
-        self.format = "hieroCube"
-        self.format_drop.setText("Hiero Cube")
+    def set_format_syntaxCube(self):
+        self.format = "syntaxCube"
+        self.format_drop.setText("Syntax Cube")
         
     def set_format_phraseStackFlag(self):
         self.format = "phraseStackFlag"

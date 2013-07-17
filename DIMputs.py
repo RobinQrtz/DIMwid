@@ -55,7 +55,7 @@ class DataInput():
                 if sentence is not None:
                     sentence.set_length()
                     self.sentences.append(sentence)
-                sentence = Hiero()
+                sentence = Syntax()
                 sentence.number = int(line.split()[2])
                 number = sentence.number
             sentence.spans[tuple([int(i) for i in line.split()[3].strip(":[]").split("..")])] \
@@ -67,7 +67,7 @@ class DataInput():
                 # = tuple([line.split(":")[1], line.split(":")[2], line.split(":")[3]])
                 
     
-    def read_hiero_cubes(self, cell_limit):
+    def read_syntax_cubes(self, cell_limit):
         self.sentences = []
         sentence = None
         number = -1
@@ -79,7 +79,7 @@ class DataInput():
                     if sentence is not None:
                         sentence.set_length()
                         self.sentences.append(sentence)
-                    sentence = Hiero_Cube()
+                    sentence = Syntax_Cube()
                     sentence.number = int(line.split()[2])
                     number = sentence.number
                 span = tuple([int(i) for i in line.split()[3].strip(":[]").split("..")])
@@ -204,7 +204,7 @@ class Phrase_Stack():
             spans += str(i) + " - " + str(self.spans[i]) + "\n"
         return str((number, length, spans))
 
-class Hiero():
+class Syntax():
     def __init__(self):
         self.number = None
         self.spans = {}
@@ -221,7 +221,7 @@ class Hiero():
             spans += str(i) + " - " + str(self.spans[i]) + "\n"
         return str((number, length, spans))
     
-class Hiero_Cube():
+class Syntax_Cube():
     def __init__(self):
         self.number = None
         self.spans = collections.defaultdict(list)
