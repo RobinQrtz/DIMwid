@@ -7,27 +7,6 @@ class DataInput():
         self.file = open(file_name, "r")
         self.sentences = None
 
-
-    def read_popped(self):
-        self.sentences = []
-        sentence = None
-        number = 0
-        for line in self.file:
-            if line.startswith("Translating:"):
-                sentence = Popped()
-                sentence.number = number
-                number += 1
-            elif line.startswith("HYPO:"):
-                span = tuple([int(i.split("]")[0]) for i in line.split()[2].strip("[]").split("..")])
-            elif line == "\n":
-                pass
-            elif line.startswith("#########") and sentence is not None:
-                sentence.set_length()
-                self.sentences.append(sentence)
-            else:
-                if sentence is not None:
-                    sentence.spans[span].append(line.strip())
-
         
     def read_phrase(self):
         self.sentences = []
@@ -35,7 +14,7 @@ class DataInput():
         span_reg = re.compile("\|[0-9]+-[0-9]+\|")
         previous = ""
         for line in self.file:
-            sentence = Phrase()
+            sentence = Single()
             for word in line.split():
                 if span_reg.match(word):
                     sentence.spans[tuple([int(i) for i in word.strip("|").split("-")])] = previous.strip()
@@ -55,7 +34,7 @@ class DataInput():
                 if sentence is not None:
                     sentence.set_length()
                     self.sentences.append(sentence)
-                sentence = Syntax()
+                sentence = Single()
                 sentence.number = int(line.split()[2])
                 number = sentence.number
             sentence.spans[tuple([int(i) for i in line.split()[3].strip(":[]").split("..")])] \
@@ -79,7 +58,7 @@ class DataInput():
                     if sentence is not None:
                         sentence.set_length()
                         self.sentences.append(sentence)
-                    sentence = Syntax_Cube()
+                    sentence = Multiple()
                     sentence.number = int(line.split()[2])
                     number = sentence.number
                 span = tuple([int(i) for i in line.split()[3].strip(":[]").split("..")])
@@ -96,17 +75,20 @@ class DataInput():
         for line in self.file:
             if len(line.split()) < 6:
                 pass
-            elif re.match("recombined=[0-9]+", line.split()[6]):
-                pass
+#            elif re.match("recombined=[0-9]+", line.split()[6]):
+#                pass
             else:
                 if int(line.split()[0]) != number:
                     if sentence is not None:
                         sentence.set_length()
                         self.sentences.append(sentence)
-                    sentence = Phrase_Stack()
+                    sentence = Multiple()
                     sentence.number = int(line.split()[0])
                     number = sentence.number
-                span = tuple([int(i) for i in line.split()[8].split("=")[1].split("-")])
+#                span = tuple([int(i) for i in line.split()[8].split("=")[1].split("-")])
+                span = re.search(r"covered=([0-9]+\-[0-9]+)", line).expand("\g<1>")
+                #print span.expand("\g<1>")
+                span = tuple([int(i) for i in span.split("-")])
                 if len(sentence.spans[span]) < cell_limit:
                     sentence.spans[span].append(line)
         if sentence is not None:
@@ -125,7 +107,7 @@ class DataInput():
                     self.sentences.append(sentence)
                     
                 number += 1
-                sentence = Phrase_Stack()
+                sentence = Multiple()
                 sentence.number = number
             else:
                 if re.match("\[[A-Z,a-z,\ ]+;\ [0-9]+-[0-9]+\]", line):
@@ -144,33 +126,38 @@ class DataInput():
         if sentence is not None:
             sentence.set_length()
             self.sentences.append(sentence)
+            
+            
+
+    def read_syntax_cube_flag(self, cell_limit):
+        self.sentences = []
+        sentence = None
+        number = -1
+        for line in self.file:
+            if len(line.split()) < 6:
+                pass
+            else:
+                if int(line.split()[0]) != number:
+                    if sentence is not None:
+                        sentence.set_length()
+                        self.sentences.append(sentence)
+                    sentence = Multiple() # 
+                    sentence.number = int(line.split()[0])
+                    number = sentence.number
+                span = re.search(r"\[([0-9]+)\.\.([0-9]+)\]", line).expand("\g<1> \g<2>")
+                span = tuple([int(i) for i in span.split()])
+                if len(sentence.spans[span]) < cell_limit:
+                    sentence.spans[span].append(line)
+        if sentence is not None:
+            sentence.set_length()
+            self.sentences.append(sentence)
         
 
 
-class Popped():
-    def __init__(self):
-        self.number = None
-        self.spans = collections.defaultdict(list)  # key=span, item=list of rules
-        self.length = None
-    
-    def set_length(self):
-        self.length = max([x[1] for x in self.spans.keys()])
-    
-    def __str__(self):
-        number = str(self.number)
-        length = str(self.length)
-        # print number, length
-        spans = "\n"
-        for i in self.spans.keys():
-            spans += str(i) + " - " 
-            for j in self.spans[i]:
-                spans += j + "\n"
-        return str((number, length, spans))
 
 
 
-
-class Phrase():
+class Single():
     def __init__(self):
         self.number = None
         self.spans = {}
@@ -187,7 +174,7 @@ class Phrase():
             spans += str(i) + " - " + str(self.spans[i]) + "\n"
         return str((number, length, spans))
 
-class Phrase_Stack():
+class Multiple():
     def __init__(self):
         self.number = None
         self.spans = collections.defaultdict(list)
@@ -204,37 +191,37 @@ class Phrase_Stack():
             spans += str(i) + " - " + str(self.spans[i]) + "\n"
         return str((number, length, spans))
 
-class Syntax():
-    def __init__(self):
-        self.number = None
-        self.spans = {}
-        self.length = None
+#class Syntax():
+#    def __init__(self):
+#        self.number = None
+#        self.spans = {}
+#        self.length = None
 
-    def set_length(self):
-        self.length = max([x[1] for x in self.spans.keys()])
+#    def set_length(self):
+#        self.length = max([x[1] for x in self.spans.keys()])
+#    
+#    def __str__(self):
+#        number = str(self.number)
+#        length = str(self.length)
+#        spans = "\n"
+#        for i in self.spans.keys():
+#            spans += str(i) + " - " + str(self.spans[i]) + "\n"
+#        return str((number, length, spans))
     
-    def __str__(self):
-        number = str(self.number)
-        length = str(self.length)
-        spans = "\n"
-        for i in self.spans.keys():
-            spans += str(i) + " - " + str(self.spans[i]) + "\n"
-        return str((number, length, spans))
-    
-class Syntax_Cube():
-    def __init__(self):
-        self.number = None
-        self.spans = collections.defaultdict(list)
-        self.length = None
+#class Syntax_Cube():
+#    def __init__(self):
+#        self.number = None
+#        self.spans = collections.defaultdict(list)
+#        self.length = None
 
-    def set_length(self):
-        self.length = max([x[1] for x in self.spans.keys()])
-    
-    def __str__(self):
-        number = str(self.number)
-        length = str(self.length)
-        spans = "\n"
-        for i in self.spans.keys():
-            spans += str(i) + " - " + str(self.spans[i]) + "\n"
-        return str((number, length, spans))
+#    def set_length(self):
+#        self.length = max([x[1] for x in self.spans.keys()])
+#    
+#    def __str__(self):
+#        number = str(self.number)
+#        length = str(self.length)
+#        spans = "\n"
+#        for i in self.spans.keys():
+#            spans += str(i) + " - " + str(self.spans[i]) + "\n"
+#        return str((number, length, spans))
 

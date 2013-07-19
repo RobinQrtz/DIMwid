@@ -49,6 +49,7 @@ class MainWindow(QtGui.QWidget):
         self.format_syntaxCube = QtGui.QPushButton("Syntax Cube")
         self.format_phraseStackFlag = QtGui.QPushButton("Phrase Stack (flag)")
         self.format_phraseStackVerbose = QtGui.QPushButton("Phrase Stack (verbose)")
+        self.format_syntaxCubeFlag = QtGui.QPushButton("Syntax Cube (flag)")
         
 
         format_action_syntax = QtGui.QWidgetAction(self.format_drop)
@@ -65,6 +66,9 @@ class MainWindow(QtGui.QWidget):
         
         format_action_phraseStackVerbose = QtGui.QWidgetAction(self.format_drop)
         format_action_phraseStackVerbose.setDefaultWidget(self.format_phraseStackVerbose)
+
+        format_action_syntaxCubeFlag = QtGui.QWidgetAction(self.format_drop)
+        format_action_syntaxCubeFlag.setDefaultWidget(self.format_syntaxCubeFlag)
         
 
         self.format_drop.menu().addAction(format_action_syntax)
@@ -72,6 +76,7 @@ class MainWindow(QtGui.QWidget):
         self.format_drop.menu().addAction(format_action_syntaxCube)
         self.format_drop.menu().addAction(format_action_phraseStackFlag)
         self.format_drop.menu().addAction(format_action_phraseStackVerbose)
+        self.format_drop.menu().addAction(format_action_syntaxCubeFlag)
 
         
         self.format_syntax.clicked.connect(self.set_format_syntax)
@@ -79,6 +84,7 @@ class MainWindow(QtGui.QWidget):
         self.format_syntaxCube.clicked.connect(self.set_format_syntaxCube)
         self.format_phraseStackFlag.clicked.connect(self.set_format_phraseStackFlag)
         self.format_phraseStackVerbose.clicked.connect(self.set_format_phraseStackVerbose)
+        self.format_syntaxCubeFlag.clicked.connect(self.set_format_syntaxCubeFlag)
 
 
 
@@ -172,6 +178,8 @@ class MainWindow(QtGui.QWidget):
                 self.data.read_phrase_stack_flag(self.cell_limit)
             elif self.format == "phraseStackVerbose":
                 self.data.read_phrase_stack_verbose(self.cell_limit)
+            elif self.format == "syntaxCubeFlag":
+                self.data.read_syntax_cube_flag(self.cell_limit)
             
 
 
@@ -263,11 +271,15 @@ class MainWindow(QtGui.QWidget):
         
     def set_format_phraseStackFlag(self):
         self.format = "phraseStackFlag"
-        self.format_drop.setText("Phrase Stack (flag)")
+        self.format_drop.setText("Phrase Stack (search-graph)")
         
     def set_format_phraseStackVerbose(self):
         self.format = "phraseStackVerbose"
         self.format_drop.setText("Phrase Stack (verbose)")
+        
+    def set_format_syntaxCubeFlag(self):
+        self.format = "syntaxCubeFlag"
+        self.format_drop.setText("Syntax Cube (search-graph)")
     
         
         
