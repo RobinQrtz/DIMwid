@@ -50,10 +50,14 @@ class DataInput():
         self.sentences = []
         sentence = None
         number = -1
+        new_item = False
         for line in self.file:
-            if not line.startswith("Trans Opt"):
+            if  line.startswith("Chart Cell"):
                 pass  # we dont care for those lines
-            else:
+            elif line.startswith("---------"):
+                new_item = True
+            elif line.startswith("Trans Opt") and new_item is True:
+                new_item = False
                 if int(line.split()[2]) != number:
                     if sentence is not None:
                         sentence.set_length()
@@ -61,7 +65,7 @@ class DataInput():
                     sentence = Multiple()
                     sentence.number = int(line.split()[2])
                     number = sentence.number
-                span = tuple([int(i) for i in line.split()[3].strip(":[]").split("..")])
+                span = tuple([int(i) for i in line.split()[3].strip(":[]").split("..")])                
                 if len(sentence.spans[span]) < cell_limit:
                     sentence.spans[span].append(line)
         if sentence is not None:
