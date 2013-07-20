@@ -38,7 +38,7 @@ class DataInput():
                 sentence.number = int(line.split()[2])
                 number = sentence.number
             sentence.spans[tuple([int(i) for i in line.split()[3].strip(":[]").split("..")])] \
- = line
+ = line.strip()
 
         if sentence is not None:
             sentence.set_length()
@@ -67,7 +67,7 @@ class DataInput():
                     number = sentence.number
                 span = tuple([int(i) for i in line.split()[3].strip(":[]").split("..")])                
                 if len(sentence.spans[span]) < cell_limit:
-                    sentence.spans[span].append(line)
+                    sentence.spans[span].append(line.strip())
         if sentence is not None:
             sentence.set_length()
             self.sentences.append(sentence)
@@ -94,7 +94,7 @@ class DataInput():
                 #print span.expand("\g<1>")
                 span = tuple([int(i) for i in span.split("-")])
                 if len(sentence.spans[span]) < cell_limit:
-                    sentence.spans[span].append(line)
+                    sentence.spans[span].append(line.strip())
         if sentence is not None:
             sentence.set_length()
             self.sentences.append(sentence)
@@ -151,7 +151,7 @@ class DataInput():
                 span = re.search(r"\[([0-9]+)\.\.([0-9]+)\]", line).expand("\g<1> \g<2>")
                 span = tuple([int(i) for i in span.split()])
                 if len(sentence.spans[span]) < cell_limit:
-                    sentence.spans[span].append(line)
+                    sentence.spans[span].append(line.strip())
         if sentence is not None:
             sentence.set_length()
             self.sentences.append(sentence)
