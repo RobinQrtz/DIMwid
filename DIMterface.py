@@ -46,7 +46,7 @@ class MainWindow(QtGui.QWidget):
 
         self.format_syntax = QtGui.QPushButton("Syntax")
         self.format_phrase = QtGui.QPushButton("Phrase")
-        self.format_syntaxCube = QtGui.QPushButton("Syntax Cube")
+        self.format_syntaxCube = QtGui.QPushButton("Syntax Cube (-Tall flag)")
         self.format_phraseStackFlag = QtGui.QPushButton("Phrase Stack (search-graph)")
         self.format_phraseStackVerbose = QtGui.QPushButton("Phrase Stack (verbose)")
         self.format_syntaxCubeFlag = QtGui.QPushButton("Syntax Cube (search-graph)")
@@ -267,7 +267,7 @@ class MainWindow(QtGui.QWidget):
         
     def set_format_syntaxCube(self):
         self.format = "syntaxCube"
-        self.format_drop.setText("Syntax Cube")
+        self.format_drop.setText("Syntax Cube (-Tall flag)")
         
     def set_format_phraseStackFlag(self):
         self.format = "phraseStackFlag"
