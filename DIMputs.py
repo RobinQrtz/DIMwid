@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import collections
 import re
 
@@ -91,7 +93,7 @@ class DataInput():
                     number = sentence.number
 #                span = tuple([int(i) for i in line.split()[8].split("=")[1].split("-")])
                 span = re.search(r"covered=([0-9]+\-[0-9]+)", line).expand("\g<1>")
-                #print span.expand("\g<1>")
+                # print span.expand("\g<1>")
                 span = tuple([int(i) for i in span.split("-")])
                 if len(sentence.spans[span]) < cell_limit:
                     sentence.spans[span].append(line.strip())
@@ -145,7 +147,7 @@ class DataInput():
                     if sentence is not None:
                         sentence.set_length()
                         self.sentences.append(sentence)
-                    sentence = Multiple() # 
+                    sentence = Multiple()  # 
                     sentence.number = int(line.split()[0])
                     number = sentence.number
                 span = re.search(r"\[([0-9]+)\.\.([0-9]+)\]", line).expand("\g<1> \g<2>")
@@ -195,7 +197,7 @@ class Multiple():
             spans += str(i) + " - " + str(self.spans[i]) + "\n"
         return str((number, length, spans))
 
-#class Syntax():
+# class Syntax():
 #    def __init__(self):
 #        self.number = None
 #        self.spans = {}
@@ -212,7 +214,7 @@ class Multiple():
 #            spans += str(i) + " - " + str(self.spans[i]) + "\n"
 #        return str((number, length, spans))
     
-#class Syntax_Cube():
+# class Syntax_Cube():
 #    def __init__(self):
 #        self.number = None
 #        self.spans = collections.defaultdict(list)

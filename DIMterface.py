@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys
+
 from PyQt4 import QtCore, QtGui
-import collections
+
 import DIMputs as my_DI
-from PyQt4.QtCore import *
+
 
         
 class MainWindow(QtGui.QWidget):
@@ -111,6 +111,8 @@ class MainWindow(QtGui.QWidget):
             "&Quit", QtGui.QDialogButtonBox.ActionRole)
         self.quit_button.clicked.connect(
             QtCore.QCoreApplication.instance().quit)
+
+
         
         # Disable navigation buttons until data is loaded: see setPath for reactivation
         self.goto_button.setDisabled(True)
@@ -152,6 +154,13 @@ class MainWindow(QtGui.QWidget):
         self.popup)
         
 
+    def closeEvent(self, *args, **kwargs):
+        # reimplementation of the close-event for closing down everything 
+        # when the main window is closed
+        QtCore.QCoreApplication.quit()
+        return QtGui.QWidget.closeEvent(self, *args, **kwargs)
+    
+    
     def setCellLimit(self, value):
         if value == 0:
             value = float("inf")
@@ -168,18 +177,33 @@ class MainWindow(QtGui.QWidget):
             self.pathLabel.setText(QtCore.QDir.toNativeSeparators(path))
             self.path = unicode(path)
             self.data = my_DI.DataInput(self.path)
-            if self.format == "syntax":
-                self.data.read_syntax()
-            elif self.format == "phrase":
-                self.data.read_phrase()
-            elif self.format == "syntaxCube":
-                self.data.read_syntax_cubes(self.cell_limit)
-            elif self.format == "phraseStackFlag":
-                self.data.read_phrase_stack_flag(self.cell_limit)
-            elif self.format == "phraseStackVerbose":
-                self.data.read_phrase_stack_verbose(self.cell_limit)
-            elif self.format == "syntaxCubeFlag":
-                self.data.read_syntax_cube_flag(self.cell_limit)
+            try:
+                if self.format == "syntax":
+                    self.data.read_syntax()
+                elif self.format == "phrase":
+                    self.data.read_phrase()
+                elif self.format == "syntaxCube":
+                    self.data.read_syntax_cubes(self.cell_limit)
+                elif self.format == "phraseStackFlag":
+                    self.data.read_phrase_stack_flag(self.cell_limit)
+                elif self.format == "phraseStackVerbose":
+                    self.data.read_phrase_stack_verbose(self.cell_limit)
+                elif self.format == "syntaxCubeFlag":
+                    self.data.read_syntax_cube_flag(self.cell_limit)
+                self.populate(0)
+            except (ValueError, IndexError) as exc:
+                self.error_dialog = QtGui.QDialog()
+                self.error_dialog.setModal(True)
+                layout = QtGui.QVBoxLayout()
+                text = QtGui.QLabel(
+                    """Something went wrong when choosing your input format/file
+                    \n""")
+                button = QtGui.QPushButton("Ok")
+                button.clicked.connect(self.error_dialog.close)
+                layout.addWidget(text)
+                layout.addWidget(button)
+                self.error_dialog.setLayout(layout)
+                self.error_dialog.show()
             
 
 
@@ -218,6 +242,9 @@ class MainWindow(QtGui.QWidget):
         self.table_widget.setSortingEnabled(False)
         self.table_widget.setRowCount(nrows)
         self.table_widget.setColumnCount(ncols)
+        # for starting the numbering of the table at zero as the spans
+        self.table_widget.setHorizontalHeaderLabels([str(x) for x in range(ncols)])
+        self.table_widget.setVerticalHeaderLabels([str(x) for x in range(nrows)])
         for i in range(nrows):
             for j in range(ncols):
                 try:
