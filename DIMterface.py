@@ -191,6 +191,7 @@ class MainWindow(QtGui.QWidget):
                 elif self.format == "syntaxCubeFlag":
                     self.data.read_syntax_cube_flag(self.cell_limit)
                 self.populate(0)
+                self.sentence_spinbox.setValue(0)
             except (ValueError, IndexError) as exc:
                 self.error_dialog = QtGui.QDialog()
                 self.error_dialog.setModal(True)
