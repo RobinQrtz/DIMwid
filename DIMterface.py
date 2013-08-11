@@ -288,27 +288,32 @@ class MainWindow(QtGui.QWidget):
     def set_format_syntax(self):
         self.format = "syntax"
         self.format_drop.setText("Syntax")
+        self.format_drop.menu().hide()
 
     def set_format_phrase(self):
         self.format = "phrase"
         self.format_drop.setText("Phrase")
+        self.format_drop.menu().hide()
         
     def set_format_syntaxCube(self):
         self.format = "syntaxCube"
         self.format_drop.setText("Syntax Cube (-Tall flag)")
+        self.format_drop.menu().hide()
         
     def set_format_phraseStackFlag(self):
         self.format = "phraseStackFlag"
         self.format_drop.setText("Phrase Stack (search-graph)")
+        self.format_drop.menu().hide()
         
     def set_format_phraseStackVerbose(self):
         self.format = "phraseStackVerbose"
         self.format_drop.setText("Phrase Stack (verbose)")
+        self.format_drop.menu().hide()
         
     def set_format_syntaxCubeFlag(self):
         self.format = "syntaxCubeFlag"
         self.format_drop.setText("Syntax Cube (search-graph)")
-    
+        self.format_drop.menu().hide()
         
         
 #    @QtCore.pyqtSlot(QtGui.QTableWidgetItem, result=QtCore.QObject)
