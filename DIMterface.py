@@ -50,6 +50,7 @@ class MainWindow(QtGui.QWidget):
         self.format_phraseStackFlag = QtGui.QPushButton("Phrase Stack (search-graph)")
         self.format_phraseStackVerbose = QtGui.QPushButton("Phrase Stack (verbose)")
         self.format_syntaxCubeFlag = QtGui.QPushButton("Syntax Cube (search-graph)")
+        self.format_mbot = QtGui.QPushButton("MBOT")
         
 
         format_action_syntax = QtGui.QWidgetAction(self.format_drop)
@@ -70,6 +71,8 @@ class MainWindow(QtGui.QWidget):
         format_action_syntaxCubeFlag = QtGui.QWidgetAction(self.format_drop)
         format_action_syntaxCubeFlag.setDefaultWidget(self.format_syntaxCubeFlag)
         
+        format_action_mbot = QtGui.QWidgetAction(self.format_drop)
+        format_action_mbot.setDefaultWidget(self.format_mbot)
 
         self.format_drop.menu().addAction(format_action_syntax)
         self.format_drop.menu().addAction(format_action_phrase)
@@ -77,6 +80,7 @@ class MainWindow(QtGui.QWidget):
         self.format_drop.menu().addAction(format_action_phraseStackFlag)
         self.format_drop.menu().addAction(format_action_phraseStackVerbose)
         self.format_drop.menu().addAction(format_action_syntaxCubeFlag)
+        self.format_drop.menu().addAction(format_action_mbot)
 
         
         self.format_syntax.clicked.connect(self.set_format_syntax)
@@ -85,6 +89,7 @@ class MainWindow(QtGui.QWidget):
         self.format_phraseStackFlag.clicked.connect(self.set_format_phraseStackFlag)
         self.format_phraseStackVerbose.clicked.connect(self.set_format_phraseStackVerbose)
         self.format_syntaxCubeFlag.clicked.connect(self.set_format_syntaxCubeFlag)
+        self.format_mbot.clicked.connect(self.set_format_mbot)
 
 
 
@@ -190,6 +195,8 @@ class MainWindow(QtGui.QWidget):
                     self.data.read_phrase_stack_verbose(self.cell_limit)
                 elif self.format == "syntaxCubeFlag":
                     self.data.read_syntax_cube_flag(self.cell_limit)
+                elif self.format == "mbot":
+                    self.data.read_mbot(self.cell_limit)
                 self.populate(0)
                 self.sentence_spinbox.setValue(0)
             except (ValueError, IndexError) as exc:
@@ -313,6 +320,11 @@ class MainWindow(QtGui.QWidget):
     def set_format_syntaxCubeFlag(self):
         self.format = "syntaxCubeFlag"
         self.format_drop.setText("Syntax Cube (search-graph)")
+        self.format_drop.menu().hide()
+        
+    def set_format_mbot(self):
+        self.format = "mbot"
+        self.format_drop.setText("MBOT")
         self.format_drop.menu().hide()
         
         

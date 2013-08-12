@@ -158,7 +158,96 @@ class DataInput():
             sentence.set_length()
             self.sentences.append(sentence)
         
-
+        
+    def read_mbot(self, cell_limit):
+        self.sentences = []
+        sentence = None
+        number = -1
+        hypo = False
+        rule = False
+        popping = False
+        target = ""
+        source = ""
+        source_parent = ""
+        target_parent = ""
+        alignment = ""
+        for line in self.file:
+            if line.startswith("Translating:"):
+                if sentence is not None:
+                    sentence.set_length()
+                    self.sentences.append(sentence)
+                sentence = Multiple()
+                sentence.number = number + 1
+                number = sentence.number
+            elif line.startswith("POPPING"):
+                popping = True 
+            elif popping is True:
+                popping = False
+                span = tuple([int(i) for i in line.split()[1].strip("[").split("]")[0].split("..")])
+                hypo = True
+            elif hypo is True:
+                if line.startswith("Target Phrases"):
+                    target = line.split(":", 1)[1].strip()
+                
+                elif line.startswith("Alignment Info"):
+                    alignment = line.split(":", 1)[1].strip()
+                    if alignment == "":
+                        alignment = "(1)"
+                    
+                elif line.startswith("Source Phrase"):
+                    source = line.split(":", 1)[1].strip()
+    
+                elif line.startswith("Source Left-hand-side"):
+                    source_parent = line.split(":", 1)[1].strip()
+    
+                elif line.startswith("Target Left-hand-side"):
+                    target_parent = line.split(":", 1)[1].strip()
+    
+                    # Input stored: now begin translation into rule-format
+                    alignment = re.sub(r"\([0-9]+\)", "||", alignment)
+                    align_blocks = alignment.split("||")[:-1]
+                    target = re.sub(r"\([0-9]+\)", "||", target)
+                    target = [x.split() for x in target.split("||")][:-1]
+                    source = source.split()
+    
+                    for i in range(len(source)):
+                        if source[i].isupper():
+                            source[i] = "[" + source[i] + "]"
+                            for k in range(len(align_blocks)):
+                                align_pairs = [tuple([int(y) for y in x.split("-")]) for x in align_blocks[k].split()]
+                                for j in filter(lambda x: x[0] == i, align_pairs):
+                                    source[i] = source[i] + "[" + target[k][j[1]] + "]"
+    
+                    for i in range(len(target)):
+                        for j in range(len(target[i])):
+                            align_pairs = [tuple([int(y) for y in x.split("-")]) for x in align_blocks[i].split()]
+                            for k in filter(lambda x: x[1] == j, align_pairs):
+                                target[i][j] = source[k[0]].split("]")[0] + "][" + target[i][j] + "]"
+                
+                
+                
+                    target = " || ".join([" ".join(x) for x in target]) + " ||"
+    
+                    source = " ".join(source)
+                    source = source + "  [" + source_parent + "]"
+    
+                    tp = re.sub(r"\([0-9]+\)", "", target_parent).split()
+                    for i in tp:
+                        target = target.replace("||", " [" + i + "] !!", 1)
+                    target = target.replace("!!", "||")
+                        
+                    rule = False
+                    search_pattern = "|||  " + source + " ||| " + target + "| ---  ||| " + alignment + "|" 
+    
+                    sentence.spans[span].append(search_pattern)
+#                    print search_pattern, span
+                    if len(sentence.spans[span]) < cell_limit:
+                        sentence.spans[span].append(search_pattern)
+            else:
+                pass
+        if sentence is not None:
+            sentence.set_length()
+            self.sentences.append(sentence)
 
 
 
@@ -197,37 +286,5 @@ class Multiple():
             spans += str(i) + " - " + str(self.spans[i]) + "\n"
         return str((number, length, spans))
 
-# class Syntax():
-#    def __init__(self):
-#        self.number = None
-#        self.spans = {}
-#        self.length = None
 
-#    def set_length(self):
-#        self.length = max([x[1] for x in self.spans.keys()])
-#    
-#    def __str__(self):
-#        number = str(self.number)
-#        length = str(self.length)
-#        spans = "\n"
-#        for i in self.spans.keys():
-#            spans += str(i) + " - " + str(self.spans[i]) + "\n"
-#        return str((number, length, spans))
-    
-# class Syntax_Cube():
-#    def __init__(self):
-#        self.number = None
-#        self.spans = collections.defaultdict(list)
-#        self.length = None
-
-#    def set_length(self):
-#        self.length = max([x[1] for x in self.spans.keys()])
-#    
-#    def __str__(self):
-#        number = str(self.number)
-#        length = str(self.length)
-#        spans = "\n"
-#        for i in self.spans.keys():
-#            spans += str(i) + " - " + str(self.spans[i]) + "\n"
-#        return str((number, length, spans))
 
